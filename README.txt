@@ -21,10 +21,3 @@ SEMGRP DEMO PACK (Secure Coding Analysis Tool)
        output = subprocess.check_output(["ping", "-c", "1", host])
    - Re-run Semgrep and capture a second screenshot showing reduced findings.
 
-What to screenshot for your report:
-   A) Terminal output from Semgrep (before fixes).
-   B) The code lines flagged (your IDE or cat -n sample_app/app.py).
-   C) Terminal output after your fix (fewer issues).
-
-Tip:
-   If 'p/python' is slow, use '--error' to only show high-severity, or '--max-target-bytes 2MB' for quick demos.
