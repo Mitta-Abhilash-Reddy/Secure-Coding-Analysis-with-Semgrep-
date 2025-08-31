@@ -1,0 +1,25 @@
+rules:
+  - id: python.subprocess.shell_true
+    languages: [python]
+    message: "Avoid subprocess with shell=True (possible command injection)."
+    severity: ERROR
+    patterns:
+      - pattern: subprocess.$FUNC(..., shell=True, ...)
+
+  - id: python.eval.on_untrusted_input
+    languages: [python]
+    message: "Avoid eval() on untrusted input."
+    severity: ERROR
+    pattern: eval(...)
+
+  - id: python.yaml.unsafe_load
+    languages: [python]
+    message: "yaml.load without Loader is unsafe. Use SafeLoader."
+    severity: WARNING
+    pattern: yaml.load(...)
+
+  - id: python.sql.fstring_execute
+    languages: [python]
+    message: "SQL built with an f-string may be injectable. Use parameterized queries."
+    severity: WARNING
+    pattern: cursor.execute(f"...")
