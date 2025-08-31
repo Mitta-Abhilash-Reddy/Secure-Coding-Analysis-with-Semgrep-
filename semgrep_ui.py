@@ -1,27 +1,49 @@
-st.sidebar.title("⚙️ Scan Options")
+import streamlit as st
+import subprocess
+import os
 
-# Option 1: Enter folder path
-folder = st.sidebar.text_input("📂 Enter folder path to scan:", "sample_app")
+st.set_page_config(page_title="Semgrep Scanner", page_icon="🔎")
 
-# Option 2: Upload a file
-uploaded_file = st.sidebar.file_uploader("📂 Or upload a file", type=["py"])
+st.title("🔎 Secure Coding Analysis with Semgrep")
+st.write("This tool scans source code for vulnerabilities using Semgrep rules.")
 
-if st.sidebar.button("▶️ Run Scan"):
+# Input field for folder
+folder = st.text_input("📂 Enter folder path to scan:", "sample_app")
+
+# Option to upload a file
+uploaded_file = st.file_uploader("📄 Or upload a Python file to scan:", type=["py"])
+
+# Run Scan button
+if st.button("▶️ Run Scan"):
+    # Determine target: uploaded file or folder
     if uploaded_file:
-        # Save uploaded file temporarily
-        with open("uploaded_temp.py", "wb") as f:
+        temp_file_path = "uploaded_temp.py"
+        with open(temp_file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        target = "uploaded_temp.py"
+        target = temp_file_path
     else:
         target = folder
 
+    # Check if the target exists
     if os.path.exists(target):
-        with st.spinner("🔎 Scanning in progress..."):
-            result = subprocess.run(
-                ["semgrep", "--config", "rules.yaml", target],
-                capture_output=True, text=True
-            )
-        st.success("✅ Scan Completed")
-        st.code(result.stdout, language="bash")
+        with st.spinner("🔎 Scanning... please wait"):
+            try:
+                result = subprocess.run(
+                    ["semgrep", "--config", "rules.yaml", target],
+                    capture_output=True, text=True, check=True
+                )
+                st.success("✅ Scan Completed")
+                st.subheader("Scan Results")
+                if result.stdout.strip():
+                    st.code(result.stdout, language="bash")
+                else:
+                    st.info("No issues found by Semgrep!")
+            except subprocess.CalledProcessError as e:
+                st.error("❌ Scan failed!")
+                st.code(e.stderr, language="bash")
     else:
-        st.error("❌ Path not found. Please upload a file or enter valid folder.")
+        st.error("❌ Target not found. Please upload a file or enter a valid folder.")
+
+    # Cleanup temporary uploaded file
+    if uploaded_file and os.path.exists(temp_file_path):
+        os.remove(temp_file_path)
