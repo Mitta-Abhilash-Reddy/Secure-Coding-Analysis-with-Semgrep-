@@ -10,6 +10,8 @@ def ping():
     host = request.args.get('host', '127.0.0.1')
     # BAD: shell=True enables command injection
     output = subprocess.check_output(f"ping -c 1 {host}", shell=True)    
+    #output = subprocess.check_output(["ping", "-c", "1", host])
+
     return output
 
 @app.route('/search')
